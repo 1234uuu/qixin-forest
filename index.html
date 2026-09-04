@@ -1982,7 +1982,7 @@ function renderQuiz(){
 function answer(k){scores[k]=(scores[k]||0)+1;qi++;renderQuiz()}
 function showResult(){
  let key=Object.keys(scores).sort((a,b)=>scores[b]-scores[a])[0]||'deer', a=animals[key];
- document.getElementById('quizBox').innerHTML=`<div class="result"><div class="big">${a.icon}</div><div class="tag">你此刻遇見的是</div><h3>${a.name}</h3><b>${a.title}</b><p>${a.text}</p><div class="small-actions"><button class="primary" onclick="goToAnimal('${key}')">認識牠</button><button class="secondary" onclick="restartQuiz()">再測一次</button></div><div class="deep-guide"><div class="guide-title">🌿 森林深處，還有一處安靜的所在</div><p>如果你也想找個地方，讓腳步慢一些、讓自己靜一靜，或許，可以再往森林裡走一點。</p><button class="primary" onclick="startForestTransitionRaw('openForestGuide()')">再往森林深處走走 →</button></div></div>`;
+ document.getElementById('quizBox').innerHTML=`<div class="result"><div class="big animal-vector-wrap">${animalIllustration(key)}</div><div class="tag">你此刻遇見的是</div><h3>${a.name}</h3><b>${a.title}</b><p>${a.text}</p><div class="small-actions"><button class="primary" onclick="goToAnimal('${key}')">認識牠</button><button class="secondary" onclick="restartQuiz()">再測一次</button></div><div class="deep-guide"><div class="guide-title">🌿 森林深處，還有一處安靜的所在</div><p>如果你也想找個地方，讓腳步慢一些、讓自己靜一靜，或許，可以再往森林裡走一點。</p><button class="primary" onclick="startForestTransitionRaw('openForestGuide()')">再往森林深處走走 →</button></div></div>`;
 }
 function openForestGuide(){
  const modal=document.getElementById('forestGuideModal');
@@ -2450,20 +2450,20 @@ function startForestTransitionRaw(code){
 </div>
 <script id="v87-forest-time-js">
 const forestLeafWords=[
-'有些路，不必急著知道終點，\n慢慢走，也會遇見自己的風景。',
-'今天照著自己的步調前進，\n不用和任何人的速度一樣。',
-'風吹過樹梢，沒有催促葉子，\n你也可以照自己的步調走。',
+'有些路，不必急著知道終點，\n慢慢走著，也會遇見自己的風景。',
+'今天前進時，照著自己的步調，\n不用比較，也不用和誰一樣快。',
+'風吹過樹梢，沒有催促葉子，\n你也可以，照自己的步調走。',
 '偶爾停一下，會看見小風景，\n安靜地待一會，也是一種前進。',
 '不一定要走得很遠，\n今天願意出發，就已經很好。',
 '森林沒有催促你的腳步，\n照著自己的步調走就好。',
 '把目光留給眼前，\n也許會遇見小小的驚喜。',
-'有些答案不必現在出現，\n適合的時候，自然會亮起來。'
+'有些答案，不必現在出現，\n到了適合的時候，自然會亮起來。'
 ];
 let forestAudioCtx=null,forestNoiseNode=null,forestGain=null;
 function openForestExperience(type){
  const m=document.getElementById('forestExperienceModal'),c=document.getElementById('forestExpContent');
  const sheet=c&&c.closest('.forest-exp-sheet'); if(sheet)sheet.classList.toggle('play-sheet',type==='play');
- if(type==='leaf') c.innerHTML=`<h3 class="forest-exp-title">🍃 森林葉語</h3><p class="forest-exp-sub">輕輕碰一下葉子，看看今天與你相遇的是哪一句話。</p><div class="leaf-stage"><div class="magic-leaf" onclick="drawForestLeaf()">🍃</div><div id="leafMessage" class="leaf-message">這片葉子還在等你。</div><button class="exp-action" onclick="drawForestLeaf()">收下一片葉語</button></div>`;
+ if(type==='leaf') c.innerHTML=`<h3 class="forest-exp-title">🍃 森林葉語</h3><p class="forest-exp-sub">輕輕碰一下葉子，看看今天與你相遇的是哪一句話。</p><div class="leaf-stage"><div class="magic-leaf" onclick="drawForestLeaf()">🍃</div><div id="leafMessage" class="leaf-message">這片葉子還在等你。</div><button class="exp-action" onclick="drawForestLeaf()" style="display:none!important">收下一片葉語</button></div>`;
  if(type==='play'){let dots='';[[16,22],[68,18],[33,39],[79,46],[19,61],[58,68],[42,80]].forEach((p,i)=>dots+=`<button class="firefly f${i+1}" style="left:${p[0]}%;top:${p[1]}%" onclick="lightFirefly(this,event)" aria-label="喚醒一點森林微光"><span class="halo"></span></button>`);c.innerHTML=`<h3 class="forest-exp-title">✨ 森林拾光</h3><p class="forest-exp-sub">夜色落下以後，沿著林間的微光慢慢走。</p><div class="firefly-stage moonlit-play-stage premium-night scene-a" id="fireflyStage" data-scene="0">${dots}<div class="premium-night-vignette"></div><div class="premium-night-mist"></div><i class="premium-bird pb1"></i><i class="premium-bird pb2"></i><div class="firefly-finish"><strong id="fireflyFinishTitle">今晚的微光，都被你遇見了</strong><span id="fireflyFinishText">森林沒有催你往前。<br>在這裡多待一會兒，也很好。</span></div><div id="fireflyNote" class="firefly-note mp-note">輕觸林間微光</div></div><button id="playReset" class="exp-action play-reset show" onclick="resetForestLights()">換一片夜色</button>`;}
  if(type==='sound') c.innerHTML=`<h3 class="forest-exp-title">🎧 森林聲音</h3><p class="forest-exp-sub">找一種聲音，陪你在森林裡待一會兒。</p><div class="sound-list"><button class="sound-choice" onclick="openSoundScene('rain')">🌧️ 林間小雨<small>細細的雨，落在葉子之間</small></button><button class="sound-choice" onclick="openSoundScene('wind')">🌿 風吹樹梢<small>風從遠處慢慢穿過森林</small></button><button class="sound-choice" onclick="openSoundScene('stream')">💧 溪邊午後<small>柔柔的水聲，陪著遠處的風</small></button><button class="sound-choice" onclick="openSoundScene('night')">🌙 森林夜晚<small>蟲鳴與很輕的夜風</small></button></div>`;
  m.classList.add('open');m.setAttribute('aria-hidden','false');
@@ -2893,6 +2893,297 @@ window.postMessage = async function(){
   cursor:default !important;
 }
 </style>
+
+
+<style id="v120-result-leaf-fix">
+/* 葉語：固定四行節奏 */
+.leaf-message{
+  white-space:pre-line !important;
+  word-break:normal !important;
+  overflow-wrap:normal !important;
+  line-break:strict !important;
+  text-wrap:unset !important;
+  text-align:center !important;
+  font-size:16px !important;
+  line-height:2.05 !important;
+  letter-spacing:0 !important;
+  max-width:100% !important;
+  padding:22px 18px !important;
+}
+
+/* 隱藏「收下一片葉語」按鈕 */
+button:has(.leaf-next-label),
+.leaf-next,
+#leafNext,
+button[onclick*="leaf"],
+button[onclick*="Leaf"]{
+  /* 僅當按鈕文字是收下一片葉語時由 JS 再精準隱藏 */
+}
+
+/* 測驗結果彈窗：手機上永遠不超出 */
+.result-modal,
+.result-card,
+.result-content,
+#resultModal .modal-card,
+#animalModal .modal-card{
+  box-sizing:border-box !important;
+  max-width:calc(100vw - 44px) !important;
+  width:calc(100vw - 44px) !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  overflow:hidden !important;
+}
+
+.result-card p,
+.result-content p,
+#resultModal p,
+#animalModal p,
+.result-desc,
+.animal-desc{
+  max-width:100% !important;
+  width:100% !important;
+  box-sizing:border-box !important;
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+  line-break:strict !important;
+  text-wrap:pretty !important;
+  text-align:center !important;
+  padding-left:18px !important;
+  padding-right:18px !important;
+  line-height:1.85 !important;
+}
+
+@media(max-width:380px){
+  .result-modal,
+  .result-card,
+  .result-content,
+  #resultModal .modal-card,
+  #animalModal .modal-card{
+    max-width:calc(100vw - 28px) !important;
+    width:calc(100vw - 28px) !important;
+  }
+  .result-card p,
+  .result-content p,
+  #resultModal p,
+  #animalModal p,
+  .result-desc,
+  .animal-desc{
+    font-size:16px !important;
+    padding-left:14px !important;
+    padding-right:14px !important;
+  }
+}
+</style>
+
+<script id="v120-ui-fixes">
+(function(){
+  /* 精準隱藏森林葉語的「收下一片葉語」按鈕 */
+  document.querySelectorAll('button').forEach(btn=>{
+    if((btn.textContent||'').trim()==='收下一片葉語'){
+      btn.style.display='none';
+    }
+  });
+
+  /* 結果彈窗內容額外保護，避免某些舊 class 沒吃到 CSS */
+  function fixResultModal(){
+    document.querySelectorAll('[class*="result"], [id*="result"], [class*="animal-modal"], [id*="animalModal"]').forEach(el=>{
+      if(el.querySelector && el.querySelector('p')){
+        el.style.maxWidth='100%';
+        el.style.boxSizing='border-box';
+      }
+    });
+  }
+  fixResultModal();
+  const mo=new MutationObserver(fixResultModal);
+  mo.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+
+<style id="v122-close-vector-fix">
+/* 關閉鍵：不用 × 字元，改成真正置中的兩條線，所有瀏覽器都不會歪 */
+.forest-exp-close,
+.animal-detail-close,
+.forest-intro-close,
+.poster-close{
+  font-size:0 !important;
+  display:block !important;
+  box-sizing:border-box !important;
+}
+.forest-exp-close::before,
+.forest-exp-close::after,
+.animal-detail-close::before,
+.animal-detail-close::after,
+.forest-intro-close::before,
+.forest-intro-close::after,
+.poster-close::before,
+.poster-close::after{
+  content:"" !important;
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  width:24px !important;
+  height:2.5px !important;
+  border-radius:3px !important;
+  background:currentColor !important;
+  transform-origin:center !important;
+}
+.forest-exp-close::before,
+.animal-detail-close::before,
+.forest-intro-close::before,
+.poster-close::before{
+  transform:translate(-50%,-50%) rotate(45deg) !important;
+}
+.forest-exp-close::after,
+.animal-detail-close::after,
+.forest-intro-close::after,
+.poster-close::after{
+  transform:translate(-50%,-50%) rotate(-45deg) !important;
+}
+
+/* 森林體驗 X 固定右上角，不受標題、字體縮放影響 */
+.forest-exp-close{
+  position:absolute !important;
+  top:18px !important;
+  right:18px !important;
+  left:auto !important;
+  width:46px !important;
+  height:46px !important;
+  margin:0 !important;
+  padding:0 !important;
+  z-index:40 !important;
+  color:#48604e !important;
+  background:rgba(255,255,255,.82) !important;
+  border-radius:50% !important;
+}
+
+/* 動物介紹 X 同樣固定 */
+.animal-detail-close{
+  position:absolute !important;
+  top:18px !important;
+  right:18px !important;
+  left:auto !important;
+  width:44px !important;
+  height:44px !important;
+  margin:0 !important;
+  padding:0 !important;
+  z-index:20 !important;
+  color:#66705f !important;
+  background:rgba(255,255,255,.76) !important;
+}
+
+/* 大型動物不再使用會被放大的系統 emoji，改成清晰 SVG */
+.animal-vector-wrap{
+  width:132px !important;
+  height:132px !important;
+  margin:0 auto 12px !important;
+  display:grid !important;
+  place-items:center !important;
+}
+.animal-vector-wrap svg,
+.animal-card .face svg,
+.animal-detail-content .face svg{
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  overflow:visible !important;
+  filter:drop-shadow(0 8px 10px rgba(54,73,52,.10));
+}
+.animal-card .face{
+  width:82px !important;
+  height:82px !important;
+  margin:2px auto 8px !important;
+  font-size:0 !important;
+}
+.animal-detail-content .face{
+  width:126px !important;
+  height:126px !important;
+  margin:0 auto 14px !important;
+  font-size:0 !important;
+}
+</style>
+
+<script id="v122-animal-vector-icons">
+function animalIllustration(key){
+  const common='viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"';
+  const svg={
+    deer:`<svg ${common}>
+      <ellipse cx="60" cy="68" rx="28" ry="29" fill="#B97845"/>
+      <ellipse cx="60" cy="76" rx="17" ry="13" fill="#E6B985"/>
+      <ellipse cx="43" cy="42" rx="9" ry="16" fill="#B97845" transform="rotate(-28 43 42)"/>
+      <ellipse cx="77" cy="42" rx="9" ry="16" fill="#B97845" transform="rotate(28 77 42)"/>
+      <path d="M44 28 C33 18 36 9 31 6 M44 27 C38 18 27 18 25 12 M76 28 C87 18 84 9 89 6 M76 27 C82 18 93 18 95 12" fill="none" stroke="#745031" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="50" cy="62" r="3.2" fill="#2D2A25"/><circle cx="70" cy="62" r="3.2" fill="#2D2A25"/>
+      <ellipse cx="60" cy="73" rx="4.5" ry="3.2" fill="#47362B"/>
+      <path d="M54 80 Q60 85 66 80" fill="none" stroke="#6B4630" stroke-width="2.6" stroke-linecap="round"/>
+      <circle cx="44" cy="72" r="4.5" fill="#E39A8C" opacity=".45"/><circle cx="76" cy="72" r="4.5" fill="#E39A8C" opacity=".45"/>
+    </svg>`,
+    rabbit:`<svg ${common}>
+      <ellipse cx="45" cy="28" rx="11" ry="27" fill="#E9D6BE" transform="rotate(-8 45 28)"/>
+      <ellipse cx="75" cy="28" rx="11" ry="27" fill="#E9D6BE" transform="rotate(8 75 28)"/>
+      <ellipse cx="45" cy="28" rx="5" ry="18" fill="#E8AEB0" opacity=".65" transform="rotate(-8 45 28)"/>
+      <ellipse cx="75" cy="28" rx="5" ry="18" fill="#E8AEB0" opacity=".65" transform="rotate(8 75 28)"/>
+      <circle cx="60" cy="70" r="31" fill="#E9D6BE"/>
+      <ellipse cx="60" cy="79" rx="17" ry="12" fill="#F5E9DA"/>
+      <circle cx="49" cy="65" r="3.4" fill="#2D2A25"/><circle cx="71" cy="65" r="3.4" fill="#2D2A25"/>
+      <path d="M60 73 l-4 4 h8z" fill="#C77D7E"/>
+      <path d="M60 78 Q55 84 51 82 M60 78 Q65 84 69 82" fill="none" stroke="#7A6150" stroke-width="2.3" stroke-linecap="round"/>
+      <circle cx="43" cy="75" r="5" fill="#E5A3A0" opacity=".42"/><circle cx="77" cy="75" r="5" fill="#E5A3A0" opacity=".42"/>
+    </svg>`,
+    squirrel:`<svg ${common}>
+      <path d="M78 67 C108 49 108 21 86 18 C68 16 69 35 82 37 C94 39 93 53 77 58Z" fill="#C86E2A"/>
+      <ellipse cx="57" cy="76" rx="28" ry="25" fill="#D98232"/>
+      <circle cx="49" cy="51" r="20" fill="#D98232"/>
+      <path d="M37 39 l3-15 12 11z" fill="#A95724"/><path d="M55 35 l12-10 2 17z" fill="#A95724"/>
+      <ellipse cx="49" cy="58" rx="12" ry="9" fill="#F0C28D"/>
+      <circle cx="43" cy="49" r="3.2" fill="#2C271F"/>
+      <ellipse cx="37" cy="58" rx="3.5" ry="2.6" fill="#4C3021"/>
+      <path d="M42 64 Q48 68 53 63" fill="none" stroke="#6A3C25" stroke-width="2.4" stroke-linecap="round"/>
+      <ellipse cx="63" cy="86" rx="14" ry="7" fill="#B8622B"/>
+    </svg>`,
+    owl:`<svg ${common}>
+      <ellipse cx="60" cy="67" rx="31" ry="35" fill="#9A6B4B"/>
+      <path d="M31 45 L38 20 L53 40 Z M89 45 L82 20 L67 40 Z" fill="#795039"/>
+      <circle cx="48" cy="59" r="14" fill="#F3E7C9"/><circle cx="72" cy="59" r="14" fill="#F3E7C9"/>
+      <circle cx="48" cy="59" r="5.2" fill="#2A2925"/><circle cx="72" cy="59" r="5.2" fill="#2A2925"/>
+      <path d="M60 65 l-6 7 h12z" fill="#D69A42"/>
+      <path d="M43 84 Q60 96 77 84" fill="none" stroke="#7B5037" stroke-width="4" stroke-linecap="round"/>
+      <path d="M31 68 Q23 75 30 89 M89 68 Q97 75 90 89" fill="none" stroke="#875B40" stroke-width="8" stroke-linecap="round"/>
+    </svg>`,
+    hedgehog:`<svg ${common}>
+      <path d="M25 76 C17 57 25 36 42 27 L45 14 L54 23 L64 12 L69 24 L82 18 L83 32 L96 31 L91 44 L104 50 L94 60 L104 70 L90 74 L92 88 L78 84 L72 98 L62 88 L51 100 L47 87 C37 87 29 83 25 76Z" fill="#79502F"/>
+      <ellipse cx="55" cy="70" rx="31" ry="24" fill="#D9AE7A"/>
+      <ellipse cx="33" cy="70" rx="9" ry="7" fill="#D9AE7A"/>
+      <circle cx="51" cy="64" r="3.2" fill="#2A2824"/>
+      <ellipse cx="27" cy="70" rx="4" ry="3" fill="#433128"/>
+      <path d="M35 77 Q45 84 56 78" fill="none" stroke="#76523A" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="48" cy="74" r="4.5" fill="#E49C8A" opacity=".4"/>
+    </svg>`,
+    fox:`<svg ${common}>
+      <path d="M33 46 L38 18 L54 38 M87 46 L82 18 L66 38" fill="#D96E2E"/>
+      <ellipse cx="60" cy="65" rx="32" ry="30" fill="#DF7733"/>
+      <path d="M39 49 L40 28 L51 42 Z M81 49 L80 28 L69 42 Z" fill="#7B4B34" opacity=".9"/>
+      <ellipse cx="60" cy="76" rx="19" ry="14" fill="#F1D4B4"/>
+      <circle cx="49" cy="61" r="3.3" fill="#282621"/><circle cx="71" cy="61" r="3.3" fill="#282621"/>
+      <path d="M60 70 l-5 4 h10z" fill="#3E2E27"/>
+      <path d="M54 79 Q60 84 66 79" fill="none" stroke="#774832" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="43" cy="72" r="4.5" fill="#E89A8A" opacity=".35"/><circle cx="77" cy="72" r="4.5" fill="#E89A8A" opacity=".35"/>
+    </svg>`
+  };
+  return svg[key] || svg.deer;
+}
+
+(function replaceLargeAnimalEmoji(){
+  Object.keys(animals).forEach(key=>{
+    const card=document.getElementById('animal-'+key);
+    if(card){
+      const face=card.querySelector('.face');
+      if(face) face.innerHTML=animalIllustration(key);
+    }
+  });
+})();
+</script>
 
 </body>
 </html><style id="v99-clear-interactive-glow">
