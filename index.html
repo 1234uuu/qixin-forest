@@ -2473,7 +2473,7 @@ function openForestExperience(type){
  const m=document.getElementById('forestExperienceModal'),c=document.getElementById('forestExpContent');
  const sheet=c&&c.closest('.forest-exp-sheet'); if(sheet)sheet.classList.toggle('play-sheet',type==='play');
  if(type==='leaf') c.innerHTML=`<h3 class="forest-exp-title">🍃 森林葉語</h3><p class="forest-exp-sub">輕輕碰一下葉子，看看今天與你相遇的是哪一句話。</p><div class="leaf-stage"><div class="magic-leaf" onclick="drawForestLeaf()">🍃</div><div id="leafMessage" class="leaf-message">這片葉子還在等你。</div><button class="exp-action" onclick="drawForestLeaf()">收下一片葉語</button></div>`;
- if(type==='play'){let dots='';[[16,22],[68,18],[33,39],[79,46],[19,61],[58,68],[42,80]].forEach((p,i)=>dots+=`<button class="firefly f${i+1}" style="left:${p[0]}%;top:${p[1]}%" onclick="lightFirefly(this,event)" aria-label="喚醒一點森林微光"><span class="halo"></span></button>`);c.innerHTML=`<h3 class="forest-exp-title">✨ 森林拾光</h3><p class="forest-exp-sub">夜色落下以後，沿著林間的微光慢慢走。</p><div class="firefly-stage moonlit-play-stage premium-night scene-a" id="fireflyStage" data-scene="0">${dots}<div class="premium-night-vignette"></div><div class="premium-night-mist"></div><i class="premium-bird pb1"></i><i class="premium-bird pb2"></i><div class="firefly-finish"><strong>今晚的微光，都被你遇見了</strong><span>森林沒有催你往前。<br>在這裡多待一會兒，也很好。</span></div><div id="fireflyNote" class="firefly-note mp-note">輕觸林間微光</div></div><button id="playReset" class="exp-action play-reset show" onclick="resetForestLights()">換一片夜色</button>`;}
+ if(type==='play'){let dots='';[[16,22],[68,18],[33,39],[79,46],[19,61],[58,68],[42,80]].forEach((p,i)=>dots+=`<button class="firefly f${i+1}" style="left:${p[0]}%;top:${p[1]}%" onclick="lightFirefly(this,event)" aria-label="喚醒一點森林微光"><span class="halo"></span></button>`);c.innerHTML=`<h3 class="forest-exp-title">✨ 森林拾光</h3><p class="forest-exp-sub">夜色落下以後，沿著林間的微光慢慢走。</p><div class="firefly-stage moonlit-play-stage premium-night scene-a" id="fireflyStage" data-scene="0">${dots}<div class="premium-night-vignette"></div><div class="premium-night-mist"></div><i class="premium-bird pb1"></i><i class="premium-bird pb2"></i><div class="firefly-finish"><strong id="fireflyFinishTitle">今晚的微光，都被你遇見了</strong><span id="fireflyFinishText">森林沒有催你往前。<br>在這裡多待一會兒，也很好。</span></div><div id="fireflyNote" class="firefly-note mp-note">輕觸林間微光</div></div><button id="playReset" class="exp-action play-reset show" onclick="resetForestLights()">換一片夜色</button>`;}
  if(type==='sound') c.innerHTML=`<h3 class="forest-exp-title">🎧 森林聲音</h3><p class="forest-exp-sub">找一種聲音，陪你在森林裡待一會兒。</p><div class="sound-list"><button class="sound-choice" onclick="openSoundScene('rain')">🌧️ 林間小雨<small>細細的雨，落在葉子之間</small></button><button class="sound-choice" onclick="openSoundScene('wind')">🌿 風吹樹梢<small>風從遠處慢慢穿過森林</small></button><button class="sound-choice" onclick="openSoundScene('stream')">💧 溪邊午後<small>柔柔的水聲，陪著遠處的風</small></button><button class="sound-choice" onclick="openSoundScene('night')">🌙 森林夜晚<small>蟲鳴與很輕的夜風</small></button></div>`;
  m.classList.add('open');m.setAttribute('aria-hidden','false');
 }
@@ -3022,3 +3022,744 @@ input, textarea, button, select{
   line-height:1.6 !important;
 }
 </style>
+
+<!-- v114: 三項核心升級
+1) 跨手機瀏覽器比例穩定
+2) 內頁視覺統一到首頁質感
+3) 每次進森林有不同的小遇見
+-->
+<style id="v114-core-upgrade">
+:root{
+  --appW:430px;
+  --appH:100dvh;
+  --forest-ink:#365344;
+  --forest-muted:#78877a;
+  --forest-paper:#fffdf5;
+  --forest-line:rgba(104,128,101,.18);
+  --forest-shadow:0 16px 38px rgba(42,67,51,.11);
+}
+
+/* 1. 跨瀏覽器穩定 */
+html{
+  width:100%;
+  min-height:100%;
+  -webkit-text-size-adjust:100% !important;
+  text-size-adjust:100% !important;
+}
+body{
+  width:100%;
+  min-height:var(--appH);
+  margin:0;
+  overflow-x:hidden;
+  justify-content:center !important;
+}
+.app{
+  width:min(100%,var(--appW)) !important;
+  max-width:var(--appW) !important;
+  min-height:var(--appH) !important;
+  margin:0 auto !important;
+  overflow-x:hidden !important;
+}
+main,.page,.section,.forest-hub-wrap{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+button,input,textarea,select{
+  font-family:inherit;
+  -webkit-text-size-adjust:100% !important;
+  text-size-adjust:100% !important;
+}
+img,svg,video,canvas{
+  max-width:100%;
+}
+.bottom{
+  width:min(100%,var(--appW)) !important;
+  max-width:var(--appW) !important;
+  left:50% !important;
+  right:auto !important;
+  transform:translateX(-50%) !important;
+}
+.nav{
+  min-width:0;
+  white-space:nowrap;
+  font-size:10px !important;
+}
+.nav span{font-size:21px !important}
+
+/* 不再用 vw 決定主要文字大小 */
+.section h2,.forest-hub-head h2{
+  font-size:25px !important;
+  line-height:1.35 !important;
+}
+.sub,.forest-hub-head p{
+  font-size:14px !important;
+  line-height:1.75 !important;
+}
+.card,.quiz-box,.forest-hub-card,.msg-form{
+  font-size:14px;
+}
+@media(max-width:360px){
+  .section{padding-left:13px !important;padding-right:13px !important}
+  .section h2,.forest-hub-head h2{font-size:23px !important}
+  .sub,.forest-hub-head p{font-size:13px !important}
+}
+
+/* 2. 內頁視覺統一：像走進同一座森林，而不是一般白卡 UI */
+.page:not(#home):not(#nest){
+  min-height:var(--appH);
+  background:
+    radial-gradient(circle at 12% 8%,rgba(238,220,156,.22),transparent 24%),
+    radial-gradient(circle at 88% 26%,rgba(127,164,122,.16),transparent 30%),
+    linear-gradient(180deg,#f7f3e5 0%,#eef3e8 55%,#e7efe5 100%);
+}
+.page:not(#home):not(#nest)::before{
+  content:"";
+  position:fixed;
+  pointer-events:none;
+  inset:0;
+  z-index:0;
+  background:
+    radial-gradient(circle at 20% 18%,rgba(255,255,255,.34) 0 1px,transparent 2px),
+    radial-gradient(circle at 76% 35%,rgba(255,255,255,.24) 0 1px,transparent 2px);
+  background-size:46px 46px,68px 68px;
+  opacity:.45;
+}
+.page:not(#home):not(#nest) > *{
+  position:relative;
+  z-index:1;
+}
+.section{
+  padding-top:24px !important;
+}
+.section h2,.forest-hub-head h2{
+  color:var(--forest-ink) !important;
+  font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  font-weight:800 !important;
+  letter-spacing:.035em;
+  text-shadow:0 1px 0 rgba(255,255,255,.8);
+}
+.sub,.forest-hub-head p{
+  color:#728075 !important;
+}
+
+/* 動物卡片 */
+.grid{
+  gap:13px !important;
+}
+.animal-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--forest-line) !important;
+  background:
+    linear-gradient(180deg,rgba(255,255,250,.95),rgba(247,246,231,.93)) !important;
+  border-radius:25px !important;
+  box-shadow:var(--forest-shadow) !important;
+}
+.animal-card::after{
+  content:"";
+  position:absolute;
+  left:-8%;right:-8%;bottom:-20px;height:58px;
+  border-radius:50%;
+  background:linear-gradient(180deg,rgba(159,183,126,.13),rgba(96,132,87,.22));
+  pointer-events:none;
+}
+.animal-card .face{
+  position:relative;z-index:2;
+  filter:drop-shadow(0 8px 10px rgba(54,73,52,.12));
+}
+.animal-card h3,.animal-card p,.animal-card .tag{position:relative;z-index:2}
+.tag{
+  background:rgba(224,236,215,.82) !important;
+  color:#55705b !important;
+  border:1px solid rgba(91,120,86,.12);
+}
+
+/* 森林功能入口 */
+.forest-hub-wrap{
+  padding:28px 16px 108px !important;
+}
+.forest-hub-card{
+  border:1px solid rgba(101,127,98,.16) !important;
+  background:rgba(255,253,245,.91) !important;
+  box-shadow:0 14px 32px rgba(55,77,58,.10) !important;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.forest-hub-card .ico{
+  filter:drop-shadow(0 5px 7px rgba(64,91,63,.12));
+}
+.forest-hub-divider{
+  color:#809083 !important;
+}
+
+/* 測驗 */
+.quiz-box{
+  border:1px solid rgba(98,124,95,.18) !important;
+  border-radius:28px !important;
+  background:
+    linear-gradient(180deg,rgba(255,254,248,.97),rgba(248,247,234,.96)) !important;
+  box-shadow:0 18px 42px rgba(51,75,55,.12) !important;
+}
+.question{
+  color:var(--forest-ink) !important;
+  font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;
+}
+.option{
+  background:rgba(255,255,252,.92) !important;
+  border:1px solid rgba(101,126,98,.16) !important;
+  border-radius:18px !important;
+  box-shadow:0 5px 14px rgba(64,87,64,.05);
+}
+.option:active{
+  transform:scale(.985);
+  background:#eef4e7 !important;
+}
+
+/* 樹洞：像森林裡的紙條 */
+.cute-board-form,.msg{
+  border:1px solid rgba(116,132,94,.16) !important;
+  background:
+    linear-gradient(180deg,rgba(255,254,247,.97),rgba(249,244,226,.95)) !important;
+  box-shadow:var(--forest-shadow) !important;
+}
+.msg{
+  position:relative;
+  overflow:hidden;
+}
+.msg::before{
+  content:"";
+  position:absolute;
+  width:60px;height:60px;
+  right:-24px;top:-24px;
+  background:rgba(144,169,112,.08);
+  border-radius:50%;
+}
+.msg-form input,.msg-form textarea{
+  background:rgba(255,255,252,.86) !important;
+  border-color:rgba(104,126,99,.18) !important;
+}
+
+/* 常用按鈕統一成森林材質 */
+.primary{
+  border-radius:18px !important;
+  background:linear-gradient(180deg,#668366,#4f6d55) !important;
+  box-shadow:0 10px 22px rgba(61,88,67,.19) !important;
+  letter-spacing:.04em;
+}
+.secondary{
+  border-radius:18px !important;
+}
+
+/* 3. 每次進森林的小遇見 */
+.forest-encounter{
+  margin:0 0 15px;
+  padding:13px 14px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:
+    linear-gradient(135deg,rgba(255,253,242,.95),rgba(232,241,224,.94));
+  border:1px solid rgba(97,126,92,.17);
+  box-shadow:0 12px 28px rgba(52,76,55,.10);
+  animation:encounterIn .55s cubic-bezier(.2,.8,.2,1);
+}
+.forest-encounter .encounter-icon{
+  width:44px;height:44px;flex:0 0 44px;
+  border-radius:15px;
+  display:grid;place-items:center;
+  font-size:25px;
+  background:rgba(255,255,255,.7);
+  box-shadow:inset 0 0 0 1px rgba(80,108,80,.08);
+}
+.forest-encounter b{
+  display:block;
+  color:#426047;
+  font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  font-size:14px;
+  margin-bottom:3px;
+}
+.forest-encounter small{
+  display:block;
+  color:#758176;
+  font-size:12px;
+  line-height:1.55;
+}
+@keyframes encounterIn{
+  from{opacity:0;transform:translateY(-8px) scale(.98)}
+  to{opacity:1;transform:none}
+}
+</style>
+
+<script id="v114-core-upgrade-js">
+(function(){
+  /* 真正使用瀏覽器可視高度，而不是網址列改變後失真的 100vh */
+  function syncViewport(){
+    const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    document.documentElement.style.setProperty('--appH', Math.round(h) + 'px');
+  }
+  syncViewport();
+  window.addEventListener('resize',syncViewport,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(syncViewport,180),{passive:true});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',syncViewport,{passive:true});
+  }
+
+  const encounters=[
+    {icon:'🦌',title:'林間有個身影停了一下',text:'小鹿從蕨葉後看了你一眼，又慢慢走進光裡。'},
+    {icon:'🐿️',title:'樹梢掉下一顆小果實',text:'松鼠似乎剛經過，還留下幾片晃動的葉子。'},
+    {icon:'🦉',title:'遠處傳來一聲低低的鳴叫',text:'抬頭時，只看見貓頭鷹的影子掠過樹冠。'},
+    {icon:'🦋',title:'一隻蝴蝶跟了你一小段路',text:'牠沒有停下，只在光裡繞了一個小圈。'},
+    {icon:'🍂',title:'一片葉子落在你面前',text:'它在風裡輕輕轉了一圈，像是在提醒你抬頭看看四周。'},
+    {icon:'✨',title:'今天的森林比平常亮一點',text:'幾點微光從草叢浮起，又悄悄散開。'},
+    {icon:'🌧️',title:'林間剛下過一場很短的雨',text:'空氣裡有濕潤的葉子味，石頭也還亮亮的。'},
+    {icon:'🐇',title:'小路旁有一對長耳朵',text:'你還沒走近，小兔已經跳到另一叢花後面。'}
+  ];
+
+  let lastEncounter=-1;
+  function makeEncounter(){
+    const host=document.querySelector('#forestHub .forest-hub-list');
+    if(!host) return;
+    const old=document.getElementById('forestEncounter');
+    if(old) old.remove();
+
+    let i;
+    do{i=Math.floor(Math.random()*encounters.length)}
+    while(encounters.length>1 && i===lastEncounter);
+    lastEncounter=i;
+    const x=encounters[i];
+
+    const box=document.createElement('div');
+    box.id='forestEncounter';
+    box.className='forest-encounter';
+    box.innerHTML=
+      '<span class="encounter-icon">'+x.icon+'</span>'+
+      '<span><b>'+x.title+'</b><small>'+x.text+'</small></span>';
+    host.prepend(box);
+  }
+
+  /* 每次真正走進「一起走走」時，可能遇到不同東西；不打斷操作。 */
+  const oldShow=window.showPage;
+  window.showPage=function(id){
+    oldShow(id);
+    if(id==='forestHub'){
+      setTimeout(makeEncounter,80);
+    }
+  };
+
+  /* 如果載入時剛好就在此頁，也補上一次 */
+  if(document.getElementById('forestHub')?.classList.contains('active')){
+    setTimeout(makeEncounter,120);
+  }
+})();
+</script>
+
+<!-- v115: microcopy variety, richer forest sounds, line-break polish -->
+<style id="v115-copy-linebreaks">
+/* Prevent awkward Chinese breaks across the site */
+body,button,input,textarea,.section,.card,.forest-hub-card,.quiz-box,.msg,
+.forest-exp-title,.forest-exp-sub,.firefly-note,.firefly-finish,
+.leaf-message,.sound-title,.sound-scene,.option,.question{
+  word-break:keep-all !important;
+  overflow-wrap:normal !important;
+  line-break:strict !important;
+}
+
+/* Let intended manual breaks display exactly where written */
+.leaf-message,
+.firefly-finish span,
+.forest-exp-sub,
+.sound-title{
+  white-space:pre-line !important;
+}
+
+/* Avoid ultra-wide single lines on compact phones */
+.firefly-finish span,
+.leaf-message{
+  max-width:92% !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+@media(max-width:360px){
+  .firefly-finish strong{font-size:17px !important;}
+  .firefly-finish span{font-size:14px !important;line-height:1.8 !important;}
+}
+</style>
+
+<script id="v115-experience-polish">
+(function(){
+  /* 森林拾光：完成後的小語每次不同 */
+  const finishMessages=[
+    {
+      t:'今晚的微光，都被你遇見了',
+      s:'有些亮光很近，有些藏得比較深。\n慢慢找，也是一種樂趣。'
+    },
+    {
+      t:'這片夜色，剛好被你走完了',
+      s:'不一定每一步都要有答案。\n有時候，遇見就已經很好。'
+    },
+    {
+      t:'最後一點微光，也亮起來了',
+      s:'森林沒有變得更快。\n只是你剛好看見得更多。'
+    },
+    {
+      t:'今晚的森林，替你留住了幾點光',
+      s:'有些微光不會一直停在原地。\n看見的那一刻，就算相遇。'
+    },
+    {
+      t:'你把這片夜色慢慢找完了',
+      s:'有些風景要多停一下才會出現。\n今晚，你沒有錯過。'
+    },
+    {
+      t:'這一晚的微光，已經收集完了',
+      s:'下一片夜色，會有不同的位置。\n也可能有不同的心情。'
+    }
+  ];
+  let lastFinish=-1;
+  function setFinishMessage(){
+    let i;
+    do{i=Math.floor(Math.random()*finishMessages.length)}
+    while(finishMessages.length>1 && i===lastFinish);
+    lastFinish=i;
+    const m=finishMessages[i];
+    const t=document.getElementById('fireflyFinishTitle');
+    const s=document.getElementById('fireflyFinishText');
+    if(t)t.textContent=m.t;
+    if(s)s.textContent=m.s;
+  }
+
+  const oldLight=window.lightFirefly;
+  if(typeof oldLight==='function'){
+    window.lightFirefly=function(el,event){
+      oldLight(el,event);
+      const st=document.getElementById('fireflyStage');
+      if(st && st.classList.contains('complete')){
+        setFinishMessage();
+      }
+    };
+  }
+
+  /* 溪邊午後：加入更自然、間歇性的蟬鳴 */
+  let cicadaTimer=null;
+  let cicadaCtx=null;
+  function cicadaPulse(){
+    try{
+      if(!cicadaCtx) cicadaCtx=new (window.AudioContext||window.webkitAudioContext)();
+      const ctx=cicadaCtx;
+      if(ctx.state==='suspended')ctx.resume();
+      const now=ctx.currentTime;
+      const master=ctx.createGain();
+      master.gain.setValueAtTime(0.0001,now);
+      master.gain.exponentialRampToValueAtTime(0.028,now+0.03);
+      master.gain.exponentialRampToValueAtTime(0.0001,now+0.6);
+      master.connect(ctx.destination);
+      for(let i=0;i<3;i++){
+        const o=ctx.createOscillator();
+        const g=ctx.createGain();
+        o.type='square';
+        o.frequency.value=4300 + Math.random()*900;
+        g.gain.value=0.12/(i+1);
+        o.connect(g);g.connect(master);
+        o.start(now+i*0.03);
+        o.stop(now+0.55+i*0.03);
+      }
+    }catch(e){}
+  }
+  function scheduleCicadas(){
+    clearTimeout(cicadaTimer);
+    const loop=()=>{
+      cicadaPulse();
+      cicadaTimer=setTimeout(loop,1800+Math.random()*2600);
+    };
+    cicadaTimer=setTimeout(loop,900+Math.random()*1200);
+  }
+  function stopCicadas(){
+    clearTimeout(cicadaTimer);
+    cicadaTimer=null;
+  }
+
+  /* 森林夜晚：增加鳥叫頻率，但保持不規則 */
+  const oldScheduleNight=window.scheduleNightBirds;
+  if(typeof oldScheduleNight==='function'){
+    window.scheduleNightBirds=function(){
+      clearTimeout(window.forestNightBirdTimer);
+      const loop=function(){
+        if(typeof window.makeNightBirdCall==='function'){
+          window.makeNightBirdCall();
+          if(Math.random()>.5){
+            setTimeout(()=>window.makeNightBirdCall&&window.makeNightBirdCall(),350+Math.random()*650);
+          }
+        }
+        window.forestNightBirdTimer=setTimeout(loop,2600+Math.random()*4200);
+      };
+      window.forestNightBirdTimer=setTimeout(loop,800+Math.random()*1400);
+    };
+  }
+
+  /* Hook sound player by title text/type */
+  const oldPlaySound=window.playForestSound;
+  if(typeof oldPlaySound==='function'){
+    window.playForestSound=function(type){
+      stopCicadas();
+      oldPlaySound(type);
+      const key=String(type||'');
+      if(key.includes('stream') || key.includes('溪')){
+        scheduleCicadas();
+      }
+    };
+  }
+  const oldStopSound=window.stopForestSound;
+  if(typeof oldStopSound==='function'){
+    window.stopForestSound=function(){
+      stopCicadas();
+      oldStopSound();
+    };
+  }
+
+  /* Also catch buttons by visible text if implementation uses numeric/type aliases. */
+  document.addEventListener('click',function(e){
+    const el=e.target.closest('button,[onclick]');
+    if(!el)return;
+    const txt=(el.textContent||'').trim();
+    if(txt.includes('溪邊午後')){
+      setTimeout(scheduleCicadas,250);
+    }else if(txt.includes('森林夜晚') || txt.includes('林間小雨') || txt.includes('風吹樹梢')){
+      stopCicadas();
+    }
+  },true);
+})();
+</script>
+
+<!-- v116: 斷句與聲音最終修正 -->
+<style id="v116-copy-fit-fix">
+/*
+  v115 的 keep-all 會讓整句中文拒絕換行，造成文字超出卡片。
+  這裡全面改回「可自然換行 + 優先漂亮斷句 + 永不溢出」。
+*/
+body, .app, .page, .section,
+.card, .animal-card, .forest-hub-card, .forest-encounter,
+.quiz-box, .msg, .msg-form, .sound-choice,
+.forest-exp-sheet, .leaf-message, .firefly-finish,
+.question, .option, button, p, h1, h2, h3, h4, small, span {
+  box-sizing:border-box !important;
+  min-width:0 !important;
+}
+
+.section h2,
+.forest-hub-head h2,
+.forest-exp-title,
+.sound-scene-title,
+.question,
+.animal-card h3,
+.firefly-finish strong {
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+  line-break:strict !important;
+  text-wrap:balance;
+  max-width:100% !important;
+}
+
+.sub,
+.forest-hub-head p,
+.forest-hub-card,
+.forest-hub-card small,
+.forest-encounter b,
+.forest-encounter small,
+.animal-card p,
+.animal-card .tag,
+.option,
+.msg,
+.msg p,
+.sound-choice,
+.sound-choice small,
+.forest-exp-sub {
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+  line-break:strict !important;
+  text-wrap:pretty;
+  max-width:100% !important;
+}
+
+/* 有手動兩行的文案，保留手動換行；但空間不足時仍可正常再換行 */
+.leaf-message,
+.firefly-finish span {
+  white-space:pre-line !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+  line-break:strict !important;
+  text-wrap:pretty;
+  width:100% !important;
+  max-width:100% !important;
+}
+
+/* 森林葉語：固定舒適字級，不再用 vw 放大 */
+.leaf-message{
+  font-size:17px !important;
+  line-height:1.9 !important;
+  letter-spacing:.01em !important;
+  padding:20px 16px !important;
+}
+
+/* 森林拾光完成小語 */
+.firefly-finish{
+  left:18px !important;
+  right:18px !important;
+  width:auto !important;
+  padding:18px 16px !important;
+}
+.firefly-finish strong{
+  font-size:18px !important;
+  line-height:1.55 !important;
+  letter-spacing:.04em !important;
+  margin:0 auto 8px !important;
+}
+.firefly-finish span{
+  display:block !important;
+  font-size:14px !important;
+  line-height:1.8 !important;
+}
+
+/* 功能卡與選項文字一定留在卡片內 */
+.forest-hub-card,
+.option,
+.sound-choice{
+  width:100% !important;
+  overflow:hidden !important;
+}
+.forest-hub-card small,
+.sound-choice small{
+  display:block !important;
+  margin-top:4px !important;
+  line-height:1.6 !important;
+}
+
+/* 小尺寸手機再稍微收字，但不改斷句邏輯 */
+@media(max-width:360px){
+  .section h2,.forest-hub-head h2{font-size:22px !important;}
+  .forest-exp-title{font-size:23px !important;}
+  .forest-exp-sub,.sub,.forest-hub-head p{font-size:13px !important;}
+  .leaf-message{font-size:16px !important;}
+  .option,.forest-hub-card,.sound-choice{font-size:13px !important;}
+  .firefly-finish strong{font-size:17px !important;}
+  .firefly-finish span{font-size:13px !important;}
+}
+
+/* 只有非常短的提示可以保持單行 */
+#fireflyStage .firefly-note.mp-note{
+  white-space:nowrap !important;
+  max-width:calc(100% - 32px) !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+</style>
+
+<script id="v116-sound-frequency-fix">
+(function(){
+  /*
+    直接回到原始森林聲音播放器，再疊加蟬鳴與夜鳥。
+    修正 v115 包裝函式參數錯位造成的聲音類型判斷問題。
+  */
+  let v116CicadaTimer=null;
+  let v116NightTimer=null;
+
+  function stopExtraForestSounds(){
+    if(v116CicadaTimer){ clearTimeout(v116CicadaTimer); v116CicadaTimer=null; }
+    if(v116NightTimer){ clearTimeout(v116NightTimer); v116NightTimer=null; }
+    if(typeof stopNightBirds==='function') stopNightBirds();
+  }
+
+  function cicadaBurst(){
+    if(!forestAudioCtx) return;
+    try{
+      const ctx=forestAudioCtx;
+      const now=ctx.currentTime;
+      const master=ctx.createGain();
+      master.gain.setValueAtTime(0.0001,now);
+      master.gain.exponentialRampToValueAtTime(0.022,now+.025);
+      master.gain.setValueAtTime(0.020,now+.55);
+      master.gain.exponentialRampToValueAtTime(0.0001,now+1.15);
+      master.connect(ctx.destination);
+
+      /* 多層高頻顫動，比單一嗶聲更像遠處蟬鳴 */
+      [3600,4100,4700].forEach((base,idx)=>{
+        const osc=ctx.createOscillator();
+        const trem=ctx.createOscillator();
+        const tremGain=ctx.createGain();
+        const gain=ctx.createGain();
+
+        osc.type='square';
+        osc.frequency.value=base + Math.random()*260;
+        trem.type='sine';
+        trem.frequency.value=24 + Math.random()*10;
+        tremGain.gain.value=.035;
+        gain.gain.value=.05/(idx+1);
+
+        trem.connect(tremGain);
+        tremGain.connect(gain.gain);
+        osc.connect(gain);
+        gain.connect(master);
+
+        osc.start(now);
+        trem.start(now);
+        osc.stop(now+1.15);
+        trem.stop(now+1.15);
+      });
+    }catch(e){}
+  }
+
+  function scheduleFrequentCicadas(){
+    if(v116CicadaTimer) clearTimeout(v116CicadaTimer);
+    const loop=()=>{
+      cicadaBurst();
+      /* 溪邊午後：大約每 0.7～1.4 秒就有一段蟬鳴 */
+      v116CicadaTimer=setTimeout(loop,700+Math.random()*700);
+    };
+    v116CicadaTimer=setTimeout(loop,250);
+  }
+
+  function nightBirdCluster(){
+    if(typeof makeNightBirdCall!=='function') return;
+    makeNightBirdCall();
+    if(Math.random()<.75){
+      setTimeout(()=>{ if(typeof makeNightBirdCall==='function') makeNightBirdCall(); },260+Math.random()*380);
+    }
+    if(Math.random()<.32){
+      setTimeout(()=>{ if(typeof makeNightBirdCall==='function') makeNightBirdCall(); },720+Math.random()*420);
+    }
+  }
+
+  function scheduleFrequentNightBirds(){
+    if(v116NightTimer) clearTimeout(v116NightTimer);
+    const loop=()=>{
+      nightBirdCluster();
+      /* 森林夜晚：每 1.4～2.8 秒一組，偶爾連叫 2～3 聲 */
+      v116NightTimer=setTimeout(loop,1400+Math.random()*1400);
+    };
+    v116NightTimer=setTimeout(loop,450);
+  }
+
+  /* 覆蓋成正確的 (btn,type) 參數版本 */
+  playForestSound=function(btn,type){
+    stopExtraForestSounds();
+
+    /* _v93PlayForestSound 是加入鳥鳴包裝前的原始播放器 */
+    const result = (typeof _v93PlayForestSound==='function')
+      ? _v93PlayForestSound.call(this,btn,type)
+      : undefined;
+
+    if(type==='stream') scheduleFrequentCicadas();
+    if(type==='night') scheduleFrequentNightBirds();
+    return result;
+  };
+
+  stopForestSound=function(){
+    stopExtraForestSounds();
+    return (typeof _v93StopForestSound==='function')
+      ? _v93StopForestSound.apply(this,arguments)
+      : undefined;
+  };
+})();
+</script>
