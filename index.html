@@ -1823,8 +1823,8 @@ html,body{width:100%;max-width:100%;overflow-x:hidden !important;}
   <div class="forest-hub-wrap">
     <div class="forest-hub-head">
       <span class="forest-hub-kicker">🌿</span>
-      <h2>今天，想在森林裡做些什麼？</h2>
-      <p>不用急著往前走，選一件此刻想做的事就好。</p>
+      <h2>今天，想在森林裡遇見什麼？</h2>
+      <p>跟著自己的步調走走，<br>也許會發現一些意想不到的小事。</p>
     </div>
     <div class="forest-hub-list">
       <button class="forest-hub-card leaf" onclick="openForestExperience('leaf')"><span class="ico">🍃</span><span class="copy"><b>森林葉語</b><small>收下一片，今天與你相遇的話</small></span><span class="arr">›</span></button>
@@ -1857,7 +1857,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden !important;}
           <label for="message">今天想留下一句什麼呢？</label>
           <textarea id="message" placeholder="寫下一句心情、一件小事，或今天想對自己說的話……"></textarea>
           <button class="primary board-send" onclick="postMessage()">把心情掛上樹梢 ✨</button>
-          <div class="notice">🌱 目前留言只會收藏在你的這台裝置裡。</div>
+          <div id="boardStatus" class="notice">🌱 正在連上森林裡共同的心情樹洞……</div>
         </div>
         <div class="board-divider"><span>🍂</span><b>森林裡留下的小紙條</b><span>🍂</span></div>
         <div id="messages" class="messages"></div>
@@ -1914,7 +1914,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden !important;}
   <nav class="bottom">
     <button class="nav active" data-page="home" onclick="showPage('home')"><span>🌲</span>森林入口</button>
     <button class="nav" data-page="animals" onclick="showPage('animals')"><span>🦌</span>遇見牠們</button>
-    <button class="nav" data-page="forestHub" onclick="showPage('forestHub')"><span>🍃</span>一起走走</button>
+    <button class="nav" data-page="forestHub" onclick="showPage('forestHub')"><span>🍃</span>漫遊森林</button>
     <button class="nav" data-page="board" onclick="showPage('board')"><span>💬</span>心情樹洞</button>
     <button class="nav" data-page="nest" onclick="showPage('nest')"><span>🏡</span>安心小窩</button>
   </nav>
@@ -1997,25 +1997,16 @@ renderQuiz();
 syncTopbar('home');
 document.body.classList.add('home-lock');
 
-const defaults=[
- {n:'森林旅人',m:'今天有點累，但看到這些小動物，心好像慢下來了一點。',t:'剛剛'},
- {n:'一片小葉子',m:'提醒自己：不用一次把所有事情想完。',t:'今天'}
-];
-function loadMessages(){
- let arr; try{arr=JSON.parse(localStorage.getItem('qixin_messages')||'null')}catch(e){}
- if(!arr)arr=defaults;
- document.getElementById('messages').innerHTML=arr.map(x=>`<div class="msg"><div class="meta">${esc(x.n)} · ${esc(x.t)}</div><p>${esc(x.m)}</p></div>`).join('');
-}
-function postMessage(){
- const n=document.getElementById('nick').value.trim()||'匿名旅人',m=document.getElementById('message').value.trim();
- if(!m)return alert('先寫下一句想說的話吧 🌿');
- let arr;try{arr=JSON.parse(localStorage.getItem('qixin_messages')||'null')}catch(e){} if(!arr)arr=defaults;
- arr.unshift({n,m,t:'剛剛'}); localStorage.setItem('qixin_messages',JSON.stringify(arr.slice(0,30)));
- document.getElementById('message').value='';loadMessages();
-}
+/* v118：公開樹洞由 Firebase Firestore 接管 */
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-loadMessages();
-
+function postMessage(){
+  const status=document.getElementById('boardStatus');
+  if(status) status.textContent='🌱 心情樹洞正在連線，請稍候一下。';
+}
+const boardBox=document.getElementById('messages');
+if(boardBox){
+  boardBox.innerHTML='<div class="msg board-loading"><div class="meta">森林正在整理紙條……</div><p>正在讀取大家留下的心情。</p></div>';
+}
 
 function goToAnimal(key){
   const card=document.getElementById('animal-'+key);
@@ -2459,14 +2450,14 @@ function startForestTransitionRaw(code){
 </div>
 <script id="v87-forest-time-js">
 const forestLeafWords=[
-'有些路，不需要急著知道會通往哪裡。\n慢慢走，也會遇見屬於你的風景。',
-'今天可以照著自己的步調前進。\n不必和任何人的速度一樣。',
-'風經過樹梢時，沒有催促任何一片葉子。\n你也可以慢一些。',
-'偶爾停一下，才會看見原本錯過的小風景。\n安靜，也是一種前進。',
-'不一定要走得很遠。\n今天願意出發，就已經很好。',
-'森林沒有催你。\n慢慢來，也沒關係。',
-'把目光留給眼前。\n也許會遇見意想不到的小驚喜。',
-'有些答案不必現在出現。\n到了適合的時候，自然會慢慢亮起。'
+'有些路，不必急著知道終點，\n慢慢走，也會遇見自己的風景。',
+'今天照著自己的步調前進，\n不用和任何人的速度一樣。',
+'風吹過樹梢，沒有催促葉子，\n你也可以照自己的步調走。',
+'偶爾停一下，會看見小風景，\n安靜地待一會，也是一種前進。',
+'不一定要走得很遠，\n今天願意出發，就已經很好。',
+'森林沒有催促你的腳步，\n照著自己的步調走就好。',
+'把目光留給眼前，\n也許會遇見小小的驚喜。',
+'有些答案不必現在出現，\n適合的時候，自然會亮起來。'
 ];
 let forestAudioCtx=null,forestNoiseNode=null,forestGain=null;
 function openForestExperience(type){
@@ -2707,6 +2698,199 @@ playForestSound=function(btn,type){
   content:none !important;
   display:none !important;
   background:none !important;
+}
+</style>
+
+
+<style id="v118-public-board-style">
+#boardStatus{
+  line-height:1.65 !important;
+  text-align:center;
+}
+#boardStatus.ok{color:#5d755f !important}
+#boardStatus.error{color:#9a5d55 !important}
+#messages .msg{
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+  line-break:strict !important;
+}
+#messages .msg .meta{
+  line-height:1.55 !important;
+}
+#messages .msg p{
+  white-space:pre-wrap !important;
+  line-height:1.8 !important;
+  margin-top:7px !important;
+}
+.board-empty{
+  text-align:center;
+  padding:22px 16px !important;
+}
+.board-empty p{
+  color:#7c897d;
+}
+.board-send:disabled{
+  opacity:.58;
+  pointer-events:none;
+}
+</style>
+
+<script type="module" id="v118-firebase-public-board">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  limit,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.2.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB6sWHLeajH4AUEp7MqXVhhwb6nV354jNM",
+  authDomain: "project-5749031623996299515.firebaseapp.com",
+  projectId: "project-5749031623996299515",
+  storageBucket: "project-5749031623996299515.firebasestorage.app",
+  messagingSenderId: "127110281141",
+  appId: "1:127110281141:web:ec3d41e917355c85148bfc",
+  measurementId: "G-SNPKL3FVKC"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const messagesRef = collection(db, "messages");
+
+const listEl = document.getElementById("messages");
+const statusEl = document.getElementById("boardStatus");
+const sendBtn = document.querySelector("#board .board-send");
+
+function safe(v){
+  return String(v ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+  }[c]));
+}
+
+function formatTime(ts){
+  if(!ts || typeof ts.toDate !== "function") return "剛剛";
+  const d = ts.toDate();
+  try{
+    return new Intl.DateTimeFormat("zh-TW",{
+      month:"numeric", day:"numeric",
+      hour:"2-digit", minute:"2-digit",
+      hour12:false
+    }).format(d);
+  }catch(e){
+    return "最近";
+  }
+}
+
+function setStatus(text, kind=""){
+  if(!statusEl) return;
+  statusEl.textContent = text;
+  statusEl.classList.remove("ok","error");
+  if(kind) statusEl.classList.add(kind);
+}
+
+function renderMessages(docs){
+  if(!listEl) return;
+  if(!docs.length){
+    listEl.innerHTML =
+      '<div class="msg board-empty">'+
+      '<div class="meta">第一張小紙條還在等人</div>'+
+      '<p>如果你願意，可以留下森林裡的第一句心情。</p>'+
+      '</div>';
+    return;
+  }
+
+  listEl.innerHTML = docs.map(docSnap=>{
+    const x = docSnap.data() || {};
+    return '<div class="msg">'+
+      '<div class="meta">'+safe(x.name || "匿名旅人")+' · '+safe(formatTime(x.createdAt))+'</div>'+
+      '<p>'+safe(x.text || "")+'</p>'+
+      '</div>';
+  }).join("");
+}
+
+const q = query(messagesRef, orderBy("createdAt","desc"), limit(50));
+
+onSnapshot(q, snap=>{
+  renderMessages(snap.docs);
+  setStatus("🌱 這裡的留言會與所有森林旅人共享。","ok");
+}, err=>{
+  console.error("Firestore listen error:", err);
+  if(listEl){
+    listEl.innerHTML =
+      '<div class="msg board-empty"><div class="meta">暫時沒有連上森林</div>'+
+      '<p>請確認網路後再重新開啟這一頁。</p></div>';
+  }
+  setStatus("🍂 目前無法讀取共用留言，請稍後再試。","error");
+});
+
+window.postMessage = async function(){
+  const nickEl = document.getElementById("nick");
+  const messageEl = document.getElementById("message");
+  const name = (nickEl?.value || "").trim() || "匿名旅人";
+  const text = (messageEl?.value || "").trim();
+
+  if(!text){
+    alert("先寫下一句想說的話吧 🌿");
+    return;
+  }
+  if(name.length > 20){
+    alert("森林旅人的名字請控制在 20 個字以內。");
+    return;
+  }
+  if(text.length > 300){
+    alert("這張小紙條最多可以寫 300 個字。");
+    return;
+  }
+
+  if(sendBtn) sendBtn.disabled = true;
+  setStatus("🌿 正在把這張小紙條掛上樹梢……");
+
+  try{
+    await addDoc(messagesRef,{
+      name,
+      text,
+      createdAt: serverTimestamp()
+    });
+    if(messageEl) messageEl.value = "";
+    setStatus("✨ 已經掛上樹梢，其他森林旅人也看得到。","ok");
+  }catch(err){
+    console.error("Firestore write error:", err);
+    setStatus("🍂 這次沒有成功送出，請確認網路後再試一次。","error");
+    alert("留言沒有送出成功，請稍後再試。");
+  }finally{
+    if(sendBtn) sendBtn.disabled = false;
+  }
+};
+</script>
+
+
+<style id="v119-leaf-firefly-fix">
+/* 葉語固定為「人工兩行」；句子已縮短，避免手機寬度再切成第三行 */
+.leaf-message{
+  width:100% !important;
+  max-width:350px !important;
+  padding:20px 14px !important;
+  font-size:16px !important;
+  line-height:2 !important;
+  letter-spacing:0 !important;
+  white-space:pre-line !important;
+  word-break:normal !important;
+  overflow-wrap:normal !important;
+  line-break:strict !important;
+}
+
+/* 微光全部找到後，不讓透明的舊光點穿透完成提示再次被點擊 */
+#fireflyStage.complete .firefly{
+  pointer-events:none !important;
+}
+#fireflyStage.complete .firefly-finish{
+  pointer-events:auto !important;
+  cursor:default !important;
 }
 </style>
 
@@ -3339,7 +3523,7 @@ img,svg,video,canvas{
     host.prepend(box);
   }
 
-  /* 每次真正走進「一起走走」時，可能遇到不同東西；不打斷操作。 */
+  /* 每次真正走進「漫遊森林」時，可能遇到不同東西；不打斷操作。 */
   const oldShow=window.showPage;
   window.showPage=function(id){
     oldShow(id);
@@ -3432,9 +3616,10 @@ body,button,input,textarea,.section,.card,.forest-hub-card,.quiz-box,.msg,
   const oldLight=window.lightFirefly;
   if(typeof oldLight==='function'){
     window.lightFirefly=function(el,event){
-      oldLight(el,event);
       const st=document.getElementById('fireflyStage');
-      if(st && st.classList.contains('complete')){
+      const wasComplete=!!(st && st.classList.contains('complete'));
+      oldLight(el,event);
+      if(st && !wasComplete && st.classList.contains('complete')){
         setFinishMessage();
       }
     };
